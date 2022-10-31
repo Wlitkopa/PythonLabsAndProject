@@ -1,9 +1,7 @@
 
 import sys
 
-sys.path.append('/home/przemek/PycharmProjects/ps/lab3/DeanerySystem')
-
-from day import Day
+sys.path.append('/lab3_4/DeanerySystem')
 
 
 def DayToStr(dzien):
@@ -17,7 +15,7 @@ def DayToStr(dzien):
     elif dzien == 3:
         name = "Czwartek"
     elif dzien == 4:
-        name = "Piatek"
+        name = "Piątek"
     elif dzien == 5:
         name = "Sobota"
     elif dzien == 6:
@@ -27,10 +25,13 @@ def DayToStr(dzien):
 
 class Term:
 
-    def __init__(self, day, hour, minute):
+    def __init__(self, day, hour, minute, duration=None):
         self.hour = hour
         self.minute = minute
-        self.duration = 90
+        if duration is not None:
+            self.duration = duration
+        else:
+            self.duration = 90
         self.__day = day
         # print("self.__day: ", self.__day)
         # print("self.__day.value: ", self.__day.value)
@@ -72,3 +73,23 @@ class Term:
         else:
             return False
 
+    def __lt__(self, other):
+        return Term.earlierThan(self, other)
+
+    def __le__(self, other):
+        return Term.earlierThan(self, other)
+
+    def __gt__(self, other):
+        return Term.laterThan(self, other)
+
+    def __ge__(self, other):
+        return Term.laterThan(self, other)
+
+    def __eq__(self, other):
+        return Term.equals(self, other)
+
+    def __sub__(self, other):
+        sel_min = (int(self.__day.value) - 1)*24*60 + int(self.hour)*60 + self.minute + self.duration
+        oth_min = (int(other.__day.value) - 1)*24*60 + int(other.hour)*60 + other.minute
+        diff = sel_min - oth_min
+        return Term(other.__day, other.hour, other.minute, diff)
