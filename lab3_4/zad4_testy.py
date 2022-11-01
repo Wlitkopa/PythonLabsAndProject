@@ -48,10 +48,5 @@ class Test_comparison(unittest.TestCase):
         self.assertEqual(Dealer.sell('Adam', 'audi'), 2)
 
 
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()

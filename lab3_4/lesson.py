@@ -37,9 +37,9 @@ class Lesson:
     pt_limit = [Day.SAT, Day.SUN, [8, 0], [20, 0], [17, 0], [20, 0]]
     entries = []
 
-    def __init__(self, term, name, teacherName, year, fulltime=None):
+    def __init__(self, termin, name, teacherName, year, fulltime=None):
 
-        self.term = term
+        self.termin = termin
         self.name = str(name)
         self.teacherName = str(teacherName)
         self.year = int(year)
@@ -51,15 +51,15 @@ class Lesson:
         Lesson.entries.append(self)
 
     def __str__(self):
-        minutes = int(int(self.term.duration) % 60)
-        hours = int((int(self.term.duration) - minutes)/60)
-        new_minute = (int(self.term.minute) + minutes) % 60
-        new_hour = int(self.term.hour) + hours + int((int(self.term.minute) + minutes - new_minute)/60)
+        minutes = int(int(self.termin.duration) % 60)
+        hours = int((int(self.termin.duration) - minutes)/60)
+        new_minute = (int(self.termin.minute) + minutes) % 60
+        new_hour = int(self.termin.hour) + hours + int((int(self.termin.minute) + minutes - new_minute)/60)
 
         if new_minute == 0:
             new_minute = str('00')
 
-        return f"{self.name} ({DayToStr(self.term._Term__day)} {self.term.hour}:{self.term.minute} - {new_hour}:{new_minute})" \
+        return f"{self.name} ({DayToStr(self.termin._Term__day)} {self.termin.hour}:{self.termin.minute} - {new_hour}:{new_minute})" \
                f"\n{yeartoString(self.year)} rok studiów {sctoStrign(self.fulltime)}" \
                f"\nProwadzący: {self.teacherName}"
 
@@ -69,12 +69,12 @@ class Lesson:
         t_min_end = t_min_start + termin.duration  # godzina zakończenia terminu w minutach
 
         for lesson in Lesson.entries:
-            print("lesson: ", lesson)
-            if termin._Term__day == lesson.term._Term__day:
+            # print("lesson: ", lesson)
+            if termin._Term__day == lesson.termin._Term__day:
                 print("t_min_start: ", t_min_start)
                 print("t_min_end: ", t_min_end)
-                l_min_start = lesson.term.hour * 60 + lesson.term.minute  # godzina rozpoczęcia lekcji w minutach
-                l_min_end = l_min_start + lesson.term.duration  # godzina zakończenia lekcji w minutach
+                l_min_start = lesson.termin.hour * 60 + lesson.termin.minute  # godzina rozpoczęcia lekcji w minutach
+                l_min_end = l_min_start + lesson.termin.duration  # godzina zakończenia lekcji w minutach
                 print("l_min_start: ", l_min_start)
                 print("l_min_end: ", l_min_end)
                 if t_min_start < l_min_start or t_min_start >= l_min_end:
@@ -99,31 +99,37 @@ class Lesson:
             limit = Lesson.pt_limit
         t_min_start = termin.hour * 60 + termin.minute  # godzina rozpoczęcia terminu w minutach
         t_min_end = t_min_start + termin.duration  # godzina zakończenia terminu w minutach
-        # print("Lesson.ft_limit[0].value (czyli monday): ", limit[0].value)
-        # print("termin._Term__day: ", termin._Term__day)
-        # print("Lesson.ft_limit[0].value: ", Lesson.ft_limit[0].value)
-        # print("Lesson.ft_limit[1].value: ", Lesson.ft_limit[1].value)
+        print("\n\nLesson.ft_limit[0].value (czyli monday): ", limit[0].value)
+        print("termin._Term__day: ", termin._Term__day)
+        print("Lesson.ft_limit[0].value: ", limit[0].value)
+        print("Lesson.ft_limit[1].value: ", limit[1].value)
+        print("\n\n")
 
         if limit[0].value <= termin._Term__day <= limit[1].value:
             print("Zaszedł if")
             z_min_start = limit[2][0]*60 + limit[2][1]  # godzina rozpoczęcia zajęć pn-czw w minutach
             z_min_end = limit[3][0]*60 + limit[3][1]  # godzina zakończenia zajęć pn-czw w minutach
-            if z_min_start <= t_min_start < z_min_end and z_min_start <= t_min_end < z_min_end:
+            if z_min_start <= t_min_start < z_min_end and z_min_start < t_min_end <= z_min_end:
                 return True
         elif termin._Term__day == Day.FRI.value:
             print("Zaszedł elif")
             z_min_start = limit[4][0] * 60 + limit[4][1]  # godzina rozpoczęcia zajęć pt w minutach
             z_min_end = limit[5][0] * 60 + limit[5][1]  # godzina zakończenia zajęć pt w minutach
-            if z_min_start <= t_min_start < z_min_end and z_min_start <= t_min_end < z_min_end:
+            if z_min_start <= t_min_start < z_min_end and z_min_start < t_min_end <= z_min_end:
                 return True
         return False
 
     def earlierDay(self):
-        Day.new_day = (self.term._Term__day.value + 6) % 7
+        print("dir(self.term): ", dir(self.termin))
+        Day.new_day = (self.termin._Term__day + 6) % 7
 
-        temp_term = Term(Day.new_day, self.term.hour, self.term.minute, self.term.duration)
+        print(f"\nself.term._Term__day: {self.termin._Term__day}")
+        print("self: ", self)
+
+        temp_term = Term(Day.new_day, self.termin.hour, self.termin.minute, self.termin.duration)
 
         # print("temp_term: ", temp_term)
+        # print("\n")
         #
         # if self.fulltime:
         #     state = "fulltime"
@@ -131,17 +137,17 @@ class Lesson:
         #     state = "parttime"
         #
         # if Lesson.busy(temp_term):
-        #     print("Termin jest wolny")
+        #     print("\nTermin jest wolny\n")
         # else:
-        #     print("Termin jest zajęty")
+        #     print("\nTermin jest zajęty\n")
         #
         # if Lesson.fit(temp_term, self.fulltime):
-        #     print(f"Ten termin zawiera się w ograniczeniu czasowym {state}")
+        #     print(f"\nTen termin zawiera się w ograniczeniu czasowym {state}\n")
         # else:
-        #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}")
+        #     print(f"\nTen termin nie jest w ograniczeniu czasowym {state}\n")
 
         if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
-            self.term = temp_term
+            self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
@@ -149,9 +155,9 @@ class Lesson:
 
 
     def laterDay(self):
-        Day.new_day = (self.term._Term__day.value + 1) % 7
+        Day.new_day = (self.termin._Term__day + 1) % 7
 
-        temp_term = Term(Day.new_day, self.term.hour, self.term.minute, self.term.duration)
+        temp_term = Term(Day.new_day, self.termin.hour, self.termin.minute, self.termin.duration)
 
         # print("temp_term: ", temp_term)
         #
@@ -171,79 +177,78 @@ class Lesson:
         #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}")
 
         if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
-            self.term = temp_term
+            self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
             return False
 
     def earlierTime(self):
-        minutes = int(int(self.term.duration) % 60)
-        hours = int((int(self.term.duration) - minutes) / 60)
-        new_minute = int(self.term.minute) - minutes
+        print("\n\n EARLIER TIME\n\n")
+        minutes = int(int(self.termin.duration) % 60)
+        hours = int((int(self.termin.duration) - minutes) / 60)
+        new_minute = int(self.termin.minute) - minutes
         if new_minute < 0:
             hours += 1
             new_minute += 60
-        new_hour = int(self.term.hour) - hours
+        new_hour = int(self.termin.hour) - hours
 
-        temp_term = Term(self.term._Term__day, new_hour, new_minute, self.term.duration)
+        temp_term = Term(self.termin._Term__day, new_hour, new_minute, self.termin.duration)
 
         print("temp_term: ", temp_term)
 
-        # print("temp_term: ", temp_term)
-        #
-        # if self.fulltime:
-        #     state = "fulltime"
-        # else:
-        #     state = "parttime"
-        #
-        # if Lesson.busy(temp_term):
-        #     print("Termin jest wolny")
-        # else:
-        #     print("Termin jest zajęty")
-        #
-        # if Lesson.fit(temp_term, self.fulltime):
-        #     print(f"Ten termin zawiera się w ograniczeniu czasowym {state}")
-        # else:
-        #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}")
+        if self.fulltime:
+            state = "fulltime"
+        else:
+            state = "parttime"
+
+        if Lesson.busy(temp_term):
+            print("\nTermin jest wolny")
+        else:
+            print("\nTermin jest zajęty")
+
+        if Lesson.fit(temp_term, self.fulltime):
+            print(f"Ten termin zawiera się w ograniczeniu czasowym {state}\n")
+        else:
+            print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
 
         if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
-            self.term = temp_term
+            self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
             return False
 
     def laterTime(self):
-        minutes = int(int(self.term.duration) % 60)
-        hours = int((int(self.term.duration) - minutes) / 60)
-        new_minute = (int(self.term.minute) + minutes) % 60
-        new_hour = int(self.term.hour) + hours + int((int(self.term.minute) + minutes - new_minute) / 60)
+        minutes = int(int(self.termin.duration) % 60)
+        hours = int((int(self.termin.duration) - minutes) / 60)
+        new_minute = (int(self.termin.minute) + minutes) % 60
+        new_hour = int(self.termin.hour) + hours + int((int(self.termin.minute) + minutes - new_minute) / 60)
 
-        temp_term = Term(self.term._Term__day, new_hour, new_minute, self.term.duration)
+        temp_term = Term(self.termin._Term__day, new_hour, new_minute, self.termin.duration)
 
         print("temp_term: ", temp_term)
 
 
-        # print("temp_term: ", temp_term)
-        #
-        # if self.fulltime:
-        #     state = "fulltime"
-        # else:
-        #     state = "parttime"
-        #
-        # if Lesson.busy(temp_term):
-        #     print("Termin jest wolny")
-        # else:
-        #     print("Termin jest zajęty")
-        #
-        # if Lesson.fit(temp_term, self.fulltime):
-        #     print(f"Ten termin zawiera się w ograniczeniu czasowym {state}")
-        # else:
-        #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}")
+        print("temp_term: ", temp_term)
+
+        if self.fulltime:
+            state = "fulltime"
+        else:
+            state = "parttime"
+
+        if Lesson.busy(temp_term):
+            print("\nTermin jest wolny")
+        else:
+            print("\nTermin jest zajęty")
+
+        if Lesson.fit(temp_term, self.fulltime):
+            print(f"Ten termin zawiera się w ograniczeniu czasowym {state}\n")
+        else:
+            print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
 
         if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
-            self.term = temp_term
+            self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
