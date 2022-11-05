@@ -6,8 +6,8 @@ from DeanerySystem.day import Day, nthDayFrom, Action
 from DeanerySystem import term
 from DeanerySystem.term import Term, DayToStr
 from enum import Enum, IntEnum
-# from DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
-# from DeanerySystem.TimetableWithoutBreaks import *
+from DeanerySystem import TimetableWithoutBreaks
+from DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
 
 
 def yeartoString(year):
@@ -41,7 +41,7 @@ class Lesson:
     pt_limit = [Day.SAT, Day.SUN, [8, 0], [20, 0], [17, 0], [20, 0]]
     entries = []
 
-    def __init__(self, timetable, termin, name, teacherName, year, fulltime=None):
+    def __init__(self, termin, name, teacherName, year, fulltime=None):
 
         self.termin = termin
         self.name = str(name)
@@ -49,17 +49,7 @@ class Lesson:
         self.year = int(year)
         self.fulltime = fulltime
 
-        if timetable.put(self):
-            print("Lesson was added")
-            self.timetable = timetable
-
-    @property
-    def timetable(self):
-        return self.__timetable
-
-    @timetable.setter
-    def timetable(self, timetable):
-        self.__timetable = timetable
+        Lesson.entries.append(self)
 
     @property
     def termin(self):
@@ -174,17 +164,13 @@ class Lesson:
         return False
 
     def earlierDay(self):
-        # print("dir(self.term): ", dir(self.termin))
-        Day.new_day = (self.termin.day + 6) % 7
+        print("dir(self.term): ", dir(self.termin))
+        Day.new_day = (self.termin._Term__day + 6) % 7
 
-
-        # print(f"\nself.term._Term__day: {self.termin.day}")
-        # print("self: ", self)
+        print(f"\nself.term._Term__day: {self.termin._Term__day}")
+        print("self: ", self)
 
         temp_term = Term(Day.new_day, self.termin.hour, self.termin.minute, self.termin.duration)
-
-        print("Nowy potencjalny termin: ", temp_term)
-
 
         # print("temp_term: ", temp_term)
         # print("\n")
@@ -204,12 +190,13 @@ class Lesson:
         # else:
         #     print(f"\nTen termin nie jest w ograniczeniu czasowym {state}\n")
 
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
+        if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
             self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
             return False
+
 
     def laterDay(self):
         Day.new_day = (self.termin._Term__day + 1) % 7
@@ -233,7 +220,7 @@ class Lesson:
         # else:
         #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}")
 
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
+        if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
             self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
@@ -252,39 +239,7 @@ class Lesson:
 
         temp_term = Term(self.termin._Term__day, new_hour, new_minute, self.termin.duration)
 
-        # print("temp_term: ", temp_term)
-
-        # if self.fulltime:
-        #     state = "fulltime"
-        # else:
-        #     state = "parttime"
-        #
-        # if Lesson.busy(temp_term):
-        #     print("\nTermin jest wolny")
-        # else:
-        #     print("\nTermin jest zajęty")
-        #
-        # if Lesson.fit(temp_term, self.fulltime):
-        #     print(f"Ten termin zawiera się w ograniczeniu czasowym {state}\n")
-        # else:
-        #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
-
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
-            self.termin = temp_term
-            print(f"\n\nPo zmianach: {self}\n\n")
-            return True
-        else:
-            return False
-
-    def laterTime(self):
-        minutes = int(int(self.termin.duration) % 60)
-        hours = int((int(self.termin.duration) - minutes) / 60)
-        new_minute = (int(self.termin.minute) + minutes) % 60
-        new_hour = int(self.termin.hour) + hours + int((int(self.termin.minute) + minutes - new_minute) / 60)
-
-        temp_term = Term(self.termin.day, new_hour, new_minute, self.termin.duration)
-
-        # print("temp_term: ", temp_term)
+        print("temp_term: ", temp_term)
 
         if self.fulltime:
             state = "fulltime"
@@ -301,15 +256,45 @@ class Lesson:
         else:
             print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
 
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
+        if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
             self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
         else:
             return False
 
+    def laterTime(self):
+        minutes = int(int(self.termin.duration) % 60)
+        hours = int((int(self.termin.duration) - minutes) / 60)
+        new_minute = (int(self.termin.minute) + minutes) % 60
+        new_hour = int(self.termin.hour) + hours + int((int(self.termin.minute) + minutes - new_minute) / 60)
 
-# timetable = TimetableWithoutBreaks()
-# term1 = Term(Day.MON, 8, 0)
-# lesson = Lesson(timetable, term1, "Podstawy programowania", "Stanisław Polak", 2)
+        temp_term = Term(self.termin._Term__day, new_hour, new_minute, self.termin.duration)
+
+        print("temp_term: ", temp_term)
+
+
+        print("temp_term: ", temp_term)
+
+        if self.fulltime:
+            state = "fulltime"
+        else:
+            state = "parttime"
+
+        if Lesson.busy(temp_term):
+            print("\nTermin jest wolny")
+        else:
+            print("\nTermin jest zajęty")
+
+        if Lesson.fit(temp_term, self.fulltime):
+            print(f"Ten termin zawiera się w ograniczeniu czasowym {state}\n")
+        else:
+            print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
+
+        if Lesson.busy(temp_term) and Lesson.fit(temp_term, self.fulltime):
+            self.termin = temp_term
+            print(f"\n\nPo zmianach: {self}\n\n")
+            return True
+        else:
+            return False
 

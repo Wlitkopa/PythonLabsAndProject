@@ -7,6 +7,13 @@ def nthDayFrom(n, day):
     return Day(nextd)
 
 
+class Action(IntEnum):
+    DAY_EARLIER = 0
+    DAY_LATER = 1
+    TIME_EARLIER = 2
+    TIME_LATER = 3
+
+    
 class Day(IntEnum):
     MON = 0
     TUE = 1

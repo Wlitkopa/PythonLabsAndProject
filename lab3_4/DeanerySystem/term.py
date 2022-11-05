@@ -28,13 +28,45 @@ class Term:
     def __init__(self, day, hour, minute, duration=None):
         self.hour = hour
         self.minute = minute
-        if duration is not None:
-            self.duration = duration
-        else:
-            self.duration = 90
-        self.__day = day
+        self.duration = duration
+        self.day = day
         # print("self.__day: ", self.__day)
         # print("self.__day.value: ", self.__day.value)
+
+    @property
+    def hour(self):
+        return self.__hour
+
+    @hour.setter
+    def hour(self, hour):
+        self.__hour = hour
+
+    @property
+    def minute(self):
+        return self.__minute
+
+    @minute.setter
+    def minute(self, minute):
+        self.__minute = minute
+
+    @property
+    def day(self):
+        return self.__day
+
+    @day.setter
+    def day(self, day):
+        self.__day = day
+
+    @property
+    def duration(self):
+        return self.__duration
+
+    @duration.setter
+    def duration(self, duration):
+        if duration is not None:
+            self.__duration = duration
+        else:
+            self.__duration = 90
 
     def __str__(self):
         return f"{DayToStr(self.__day)} {self.hour}:{self.minute} [{self.duration}]"

@@ -1,13 +1,14 @@
-def my_function():
+def function():
     print('my_function was called')
-my_function()
+function()
 print('pies')
 
-# pies
-# dom
+        
+# kot dom
 inti = 0
 
-# komentarz
-# wielo
-# linijkowy
+        
+# komentarz wielo linijkowy
 intf = 1
+f = 1
+
