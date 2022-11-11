@@ -19,7 +19,6 @@ class BasicTimetable(ABC):
 
     def __init__(self):
         self.timetable = []
-        self.dictionary = {}
         self.secret = 10
 
     def busy(self, term: Term) -> bool:
@@ -28,49 +27,32 @@ class BasicTimetable(ABC):
 
         t_min_start = term.hour * 60 + term.minute  # godzina rozpoczęcia terminu w minutach
         t_min_end = t_min_start + term.duration  # godzina zakończenia terminu w minutach
-        # print(self.timetable)
 
-        # print("\n\nRozpatrywany termin: ", term)
-
-        # for lesson in self.timetable:
-        #     print(lesson)
-        #     print("\n")
-        # print("Wszystkie terminy: ", self.timetable)
-
-        # print(self.dictionary)
-
-        if self.dictionary.get(term) is None:
-            print("Zwróciło True")
-            return True
-        else:
-            print("Zwróciło False")
-            return False
-
-        # for lesson in self.timetable:
-        #     # print("lesson: ", lesson)
-        #     if term.day == lesson.termin.day:
-        #         # print("t_min_start: ", t_min_start)
-        #         # print("t_min_end: ", t_min_end)
-        #         l_min_start = lesson.termin.hour * 60 + lesson.termin.minute  # godzina rozpoczęcia lekcji w minutach
-        #         l_min_end = l_min_start + lesson.termin.duration  # godzina zakończenia lekcji w minutach
-        #         # print("l_min_start: ", l_min_start)
-        #         # print("l_min_end: ", l_min_end)
-        #         if t_min_start < l_min_start or t_min_start >= l_min_end:
-        #             if t_min_end <= l_min_start or t_min_end > l_min_end:
-        #                 if not (t_min_start < l_min_start and t_min_end > l_min_end):
-        #                     pass
-        #                 else:
-        #                     # print(f"Termin jest zajęty. Kolizja z {lesson}")
-        #                     return False
-        #                 pass
-        #             else:
-        #                 # print(f"Termin jest zajęty. Kolizja z {lesson}")
-        #                 return False
-        #         else:
-        #             # print(f"Termin jest zajęty. Kolizja z {lesson}")
-        #             return False
+        for lesson in self.timetable:
+            # print("lesson: ", lesson)
+            if term.day == lesson.termin.day:
+                # print("t_min_start: ", t_min_start)
+                # print("t_min_end: ", t_min_end)
+                l_min_start = lesson.termin.hour * 60 + lesson.termin.minute  # godzina rozpoczęcia lekcji w minutach
+                l_min_end = l_min_start + lesson.termin.duration  # godzina zakończenia lekcji w minutach
+                # print("l_min_start: ", l_min_start)
+                # print("l_min_end: ", l_min_end)
+                if t_min_start < l_min_start or t_min_start >= l_min_end:
+                    if t_min_end <= l_min_start or t_min_end > l_min_end:
+                        if not (t_min_start < l_min_start and t_min_end > l_min_end):
+                            pass
+                        else:
+                            # print(f"Termin jest zajęty. Kolizja z {lesson}")
+                            return False
+                        pass
+                    else:
+                        # print(f"Termin jest zajęty. Kolizja z {lesson}")
+                        return False
+                else:
+                    # print(f"Termin jest zajęty. Kolizja z {lesson}")
+                    return False
         # print("Termin jest wolny")
-        # return True
+        return True
 ##########################################################
 
     @abstractmethod

@@ -5,15 +5,15 @@ sys.path.append("/home/przemek/PycharmProjects/ps")
 # import day
 from lab3_4.DeanerySystem.day import Day, nthDayFrom, Action
 # import term
-from lab3_4.DeanerySystem.term import Term, DayToStr
+from lab3_4.DeanerySystem.term import Term, DayToStr, BasicTerm
 # sys.path.append("/home/przemek/PycharmProjects/ps")
 from lab3_4.lesson import Lesson
 
 
 class Break:
 
-    def __init__(self, term):
-        self.term = term
+    def __init__(self, basicTerm):
+        self.term = basicTerm
         # print(f"self.term.day: {self.term.day}")
 
     def __str__(self):

@@ -77,6 +77,17 @@ class Term(BasicTerm):
     def __str__(self):
         return f"{DayToStr(self.__day)} {self.hour}:{self.minute} [{self.duration}]"
 
+    def __hash__(self):
+        first = hash(self.day)
+        second = hash(first + self.hour)
+        third = hash(second + self.minute)
+        fourth = hash(third + self.duration)
+        return fourth
+
+    def __eq__(self, other):
+        # return self.__hash__() == other.hash()
+        return hasattr(other, 'day') and self.day == other.day and self.hour == other.hour and self.minute == other.minute and self.duration == other.duration
+
     def earlierThan(self, termin):
         if self.__day.value < termin.__day.value:
             return True

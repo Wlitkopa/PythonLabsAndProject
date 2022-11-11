@@ -10,7 +10,7 @@ from lab3_4.DeanerySystem.term import Term, DayToStr
 from lab3_4.DeanerySystem.Break import Break
 # sys.path.append("/home/przemek/PycharmProjects/ps")
 from lab3_4.lesson import Lesson
-from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable
+from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable, NoRecordError
 
 
 class TimetableWithBreaks(BasicTimetable):
@@ -24,6 +24,37 @@ class TimetableWithBreaks(BasicTimetable):
         super().__init__()
         self.breaks = breaks
         self.skipBreaks = skipBreaks
+
+    @property
+    def skipBreaks(self):
+        return self.__skipBreaks
+
+    @skipBreaks.setter
+    def skipBreaks(self, skipBreaks):
+
+        if skipBreaks:
+            self.__skipBreaks = True
+        else:
+            self.__skipBreaks = False
+
+    @property
+    def breaks(self):
+        return self.__breaks
+
+    @breaks.setter
+    def breaks(self, breaks):
+
+        if breaks is not None:
+            for br in breaks:
+                try:
+                    br.term
+                except AttributeError:
+                    raise TypeError("Break chould be defined using BasicTerm class")
+            else:
+                self.__breaks = breaks
+
+        else:
+            self.__breaks = breaks
 
     def can_be_transferred_to(self, term: Term, fullTime: bool, laterTime=None, put=False) -> bool:
 
@@ -43,9 +74,9 @@ class TimetableWithBreaks(BasicTimetable):
                         break_min_end = break_min_start + pot_break.term.duration
 
                         if t_min_start <= break_min_start < t_min_end or t_min_start < break_min_end <= t_min_end:
-                            print("Potencjalny termini nowej lekcji nachodzi na przerwę")
+                            # print("Potencjalny termin nowej lekcji nachodzi na przerwę")
                             if not self.skipBreaks:
-                                print("skipBreaks ma wartość False. Nie można pomijać przerw")
+                                # print("skipBreaks ma wartość False. Nie można pomijać przerw")
                                 return False
 
                             else:
@@ -72,9 +103,9 @@ class TimetableWithBreaks(BasicTimetable):
                         break_min_end = break_min_start + pot_break.term.duration
 
                         if t_min_start <= break_min_start < t_min_end or t_min_start < break_min_end <= t_min_end:
-                            print("Potencjalny termini nowej lekcji nachodzi na przerwę")
+                            # print("Potencjalny termin nowej lekcji nachodzi na przerwę")
                             if not self.skipBreaks:
-                                print("skipBreaks ma wartość False. Nie można pomijać przerw")
+                                # print("skipBreaks ma wartość False. Nie można pomijać przerw")
                                 return False
 
                             else:
@@ -132,17 +163,27 @@ class TimetableWithBreaks(BasicTimetable):
                 break_min_end = break_min_start + pot_break.term.duration
 
                 if lesson_min_start <= break_min_start < lesson_min_end or lesson_min_start < break_min_end <= lesson_min_end:
-                    print("Lekcja nachodzi na przerwę")
-                    return False
+                    raise ValueError("This lesson colides with break time")
+                    # print("Lekcja nachodzi na przerwę")
+                    # return False
 
             self.timetable.append(lesson)
+            self.dictionary[lesson.termin] = lesson
             return True
         else:
-            print("Lesson couldn't be added. Timetable slot is already occupied "
-                  "or this lesson term do not fit in the fulltime/parttime scheme")
-            return False
+            raise ValueError("Lesson couldn't be added. Timetable slot is already occupied "
+                             "or this lesson term do not fit in the fulltime/parttime scheme")
+            # print("Lesson couldn't be added. Timetable slot is already occupied "
+            #       "or this lesson term do not fit in the fulltime/parttime    scheme")
+            # return False
 
     def get(self, term: Term, new_hour=None, new_min=None) -> Lesson:
+
+        # if isinstance(term, Term):
+        #     pass
+        # else:
+        #     raise TypeError("term should be class Term object")
+
         t_min_start = term.hour * 60 + term.minute  # godzina rozpoczęcia terminu w minutach
 
         if new_hour is None:
@@ -175,6 +216,10 @@ class TimetableWithBreaks(BasicTimetable):
         return None
 
     def __str__(self):
+
+        if len(self.timetable) == 0:
+            raise NoRecordError()
+
         output = ""
         basic_hour = 8
         basic_min = 0
@@ -261,35 +306,15 @@ class TimetableWithBreaks(BasicTimetable):
             temp_new_min = str(new_min)
             temp_basic_min = str(basic_min)
             if basic_min == 0:
-                print("Działam")
+                # print("Działam")
                 temp_basic_min = "00"
             if new_min == 0:
-                print("Działam")
+                # print("Działam")
                 temp_new_min = "00"
 
             new_set = str(f"{basic_hour}:{temp_basic_min} - {new_hour}:{temp_new_min}")
             output += "\n"
             output += f"{new_set:15}"
-
-
-            # basic_min = int(basic_minutes % 60)
-            # basic_hour = int(int(basic_minutes - basic_min) / 60)
-
-
-            # minutes = 90 * i
-            # new_min = int(minutes % 60)
-            # hours = int(8 + (int(minutes) - new_min)/60)
-
-
-
-            # if i % 2 == 0:
-            #     new_set = str(f"{hours}:00 - {hours + 1}:30")
-            #     output += f"{new_set:15}"
-            # else:
-            #     new_set = str(f"{hours}:30 - {hours + 2}:00")
-            #     output += f"{new_set:15}"
-            # print(f"\n\nhours: {hours}\nnew_min: {new_min}\n\n")
-
             # print(f"\nStarting hour: {basic_hour}:{basic_min}")
 
             for j in range(7):
@@ -317,10 +342,10 @@ class TimetableWithBreaks(BasicTimetable):
                 temp_new_min = str(new_min)
                 temp_basic_min = str(basic_min)
                 if basic_min == 0:
-                    print("Działam")
+                    # print("Działam")
                     temp_basic_min = "00"
                 if new_min == 0:
-                    print("Działam")
+                    # print("Działam")
                     temp_new_min = "00"
 
                 output += "\n"
@@ -333,7 +358,7 @@ class TimetableWithBreaks(BasicTimetable):
         f = open("tabela.txt", "w")
         f.write(output)
         f.close()
-        print("Wszystkie lekcje: ", self.timetable)
+        # print("Wszystkie lekcje: ", self.timetable)
         return output
 
 

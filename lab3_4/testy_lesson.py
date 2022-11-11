@@ -8,9 +8,31 @@ from enum import Enum, IntEnum
 import lesson
 from lesson import Lesson, yeartoString, sctoStrign
 from DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
+from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable, NoRecordError
 
 
 class Test_TestAll(unittest.TestCase):
+
+    def test_print_zero(self):
+        with self.assertRaises(NoRecordError):
+            timetable = TimetableWithoutBreaks()
+            print(timetable)
+
+    def test_input(self):
+        with self.assertRaises(TypeError):
+            term1 = Term(Day.MON, 8, 0)
+            lesson100 = Lesson("kot", term1, "Podstawy programowania", "Stanisław Polak", 2)
+        with self.assertRaises(TypeError):
+            timetable = TimetableWithoutBreaks()
+            lesson100 = Lesson(timetable, "kot", "Podstawy programowania", "Stanisław Polak", 2)
+        with self.assertRaises(TypeError):
+            term1 = Term(Day.MON, 8, 0)
+            timetable = TimetableWithoutBreaks()
+            lesson100 = Lesson(timetable, term1, "Podstawy programowania", "Stanisław Polak", 10)
+        with self.assertRaises(ValueError   ):
+            term1 = Term(Day.MON, 8, 0)
+            timetable = TimetableWithoutBreaks()
+            lesson100 = Lesson(timetable, term1, "Podstawy programowania", "Stanisław Polak", "kot")
 
     timetable = TimetableWithoutBreaks()
     term1 = Term(Day.MON, 8, 0)
@@ -32,11 +54,13 @@ class Test_TestAll(unittest.TestCase):
     term9 = Term(Day.THU, 9, 30)
     lesson9 = Lesson(timetable, term9, "wf", "prof Wycisk", 2)
 
-
     def test_put(self): # SKORO DODAJĘ LEKCJE Z WYKORZYSTANIEM METODY "put", TO ZNACZY ŻE DZIAŁA JEŻELI CHODZI O POMYŚLNE DODAWANIE
-        term_temp = Term(Day.THU, 9, 30)
-        lesson_temp = Lesson(Test_TestAll.timetable, term_temp, "taniec", "prof Jive", 2)
-        self.assertEqual(Test_TestAll.timetable.put(lesson_temp), False)  # bo wtedy są zajęcia z wf
+
+        with self.assertRaises(ValueError):
+            term_temp = Term(Day.THU, 9, 30)
+            lesson_temp = Lesson(Test_TestAll.timetable, term_temp, "taniec", "prof Jive", 2)  # bo wtedy występuje kolizja z wf
+
+        # self.assertEqual(Test_TestAll.timetable.put(lesson_temp), False)  # bo wtedy występuje kolizja z wf
 
     def test_get(self):
         term_temp = Term(Day.THU, 9, 30)
@@ -105,16 +129,23 @@ class Test_TestAll(unittest.TestCase):
         self.assertEqual(Test_TestAll.timetable.can_be_transferred_to(term1_2, Test_TestAll.lesson6.fulltime), True)  # można przesunąć Anatomię (parttime)
 
     def test_parse(self):
-        lista = "d+ t- d- t+ Alamakota 123"
+        lista = "d+ t- d- t+"
         lista = lista.split(' ')
         self.assertEqual(Test_TestAll.timetable.parse(lista), [1, 2, 0, 3])
 
+        with self.assertRaises(ValueError) as context:
+            lista = "d+ t- d- t+ Ala ma kota"
+            lista = lista.split(' ')
+            Test_TestAll.timetable.parse(lista)
+
+        # self.assertTrue('This is broken' in context.exception)
+
     def test_perform(self):
-        lista = "d+ t- t- t+ d+ d+ t- d- Alamakota 123"
+        lista = "d+ t- t- t+ d+ d+ t- d-"
         lista = lista.split(' ')
         moves = Test_TestAll.timetable.parse(lista)
         Test_TestAll.timetable.perform(moves)
-        print(Test_TestAll.timetable)
+        # print(Test_TestAll.timetable)
         self.assertEqual(Test_TestAll.lesson1.termin.day, Test_TestAll.term1.day)  # lesson1 nie mogła się przesunąć, bo termin wychodzi poza fulltime
         self.assertEqual(Test_TestAll.lesson2.termin.hour, Test_TestAll.term2.hour)
         self.assertEqual(Test_TestAll.lesson2.termin.minute, Test_TestAll.term2.minute)  # lesson2 nie mogła się przesunąć, bo termin wychodzi poza fulltime
@@ -129,13 +160,13 @@ class Test_TestAll(unittest.TestCase):
         self.assertEqual(Test_TestAll.lesson7.termin.hour, term1_2.hour)
         self.assertEqual(Test_TestAll.lesson7.termin.minute, term1_2.minute)  # lesson7 mogła się przesunąć o termin do tyłu
         term1_2 = Term(Day.TUE, 18, 30)
-        print(Test_TestAll.timetable)
-        print(f"\nTERAZ JEST LESSON8\n\n{Test_TestAll.lesson8}\n\n")
-        print("Actions: ", moves)
+        # print(Test_TestAll.timetable)
+        # print(f"\nTERAZ JEST LESSON8\n\n{Test_TestAll.lesson8}\n\n")
+        # print("Actions: ", moves)
         self.assertEqual(Test_TestAll.lesson8.termin.day, term1_2.day)
         self.assertEqual(Test_TestAll.lesson8.termin.hour, term1_2.hour)
         self.assertEqual(Test_TestAll.lesson8.termin.minute, term1_2.minute)  # lesson8 mogła się przesunąć o dzień w tył
-        lista = "d+ t- t- t- d+ d+ t+ d+ Alamakota 123"
+        lista = "d+ t- t- t- d+ d+ t+ d+"
         lista = lista.split(' ')
         moves = Test_TestAll.timetable.parse(lista)
         Test_TestAll.timetable.perform(moves)

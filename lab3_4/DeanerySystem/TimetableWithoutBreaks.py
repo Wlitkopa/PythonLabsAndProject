@@ -8,7 +8,7 @@ from lab3_4.DeanerySystem.day import Day, nthDayFrom, Action
 from lab3_4.DeanerySystem.term import Term, DayToStr
 # sys.path.append("/home/przemek/PycharmProjects/ps")
 from lab3_4.lesson import Lesson
-from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable
+from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable, NoRecordError
 
 
 class TimetableWithoutBreaks(BasicTimetable):
@@ -54,13 +54,23 @@ class TimetableWithoutBreaks(BasicTimetable):
 
         if TimetableWithoutBreaks.can_be_transferred_to(self, lesson.termin, lesson.fulltime):
             self.timetable.append(lesson)
+            self.dictionary[lesson.termin] = lesson
             return True
         else:
-            print("Lesson couldn't be added. Timetable slot is already occupied "
-                  "or this lesson term do not fit in the fulltime/parttime scheme")
-            return False
+            raise ValueError("Lesson couldn't be added. Timetable slot is already occupied "
+                             "or this lesson term do not fit in the fulltime/parttime scheme")
+            # print("Lesson couldn't be added. Timetable slot is already occupied "
+            #       "or this lesson term do not fit in the fulltime/parttime scheme")
+            # return False
 
     def get(self, term: Term) -> Lesson:
+
+        # if isinstance(term, Term):
+        #     pass
+        # else:
+        #     print(type(term))
+        #     raise TypeError("term should be class Term object")
+
         t_min_start = term.hour * 60 + term.minute  # godzina rozpoczęcia terminu w minutach
         t_min_end = t_min_start + term.duration  # godzina zakończenia terminu w minutach
 
@@ -89,6 +99,10 @@ class TimetableWithoutBreaks(BasicTimetable):
         return None
 
     def __str__(self):
+
+        if len(self.timetable) == 0:
+            raise NoRecordError()
+
         output = str()
         star = "*"
         space = " "
@@ -132,7 +146,7 @@ class TimetableWithoutBreaks(BasicTimetable):
         return output
 
 
-timetable = TimetableWithoutBreaks()
-print(timetable)
+# timetable = TimetableWithoutBreaks()
+# print(timetable)
 # print("TimetableWithoutBreaks.list: ", timetable.timetable)
 
