@@ -8,10 +8,9 @@ from lab3_4.DeanerySystem.day import Day, nthDayFrom, Action
 from lab3_4.DeanerySystem.term import Term, DayToStr
 # sys.path.append("/home/przemek/PycharmProjects/ps")
 from lab3_4.lesson import Lesson
-from lab3_4.DeanerySystem.BasicTimetable import BasicTimetable
 
 
-class TimetableWithoutBreaks(BasicTimetable):
+class TimetableWithoutBreaks:
     """ Class containing a set of operations to manage the timetable """
 
     #                                              hours for friday
@@ -19,9 +18,9 @@ class TimetableWithoutBreaks(BasicTimetable):
     pt_limit = [Day.SAT, Day.SUN, [8, 0], [20, 0], [17, 0], [20, 0]]
 
     def __init__(self):
-        super().__init__()
+        self.timetable = []
 
-    def can_be_transferred_to(self, term: Term, fullTime: bool, earlierTime=None) -> bool:
+    def can_be_transferred_to(self, term: Term, fullTime: bool) -> bool:
 
         limit = []
         if fullTime:
@@ -50,6 +49,39 @@ class TimetableWithoutBreaks(BasicTimetable):
                 return True
         return False
 
+    def busy(self, term: Term) -> bool:
+
+        print("Potencjalny termin: ", term)
+
+        t_min_start = term.hour * 60 + term.minute  # godzina rozpoczęcia terminu w minutach
+        t_min_end = t_min_start + term.duration  # godzina zakończenia terminu w minutach
+
+        for lesson in self.timetable:
+            # print("lesson: ", lesson)
+            if term.day == lesson.termin.day:
+                # print("t_min_start: ", t_min_start)
+                # print("t_min_end: ", t_min_end)
+                l_min_start = lesson.termin.hour * 60 + lesson.termin.minute  # godzina rozpoczęcia lekcji w minutach
+                l_min_end = l_min_start + lesson.termin.duration  # godzina zakończenia lekcji w minutach
+                # print("l_min_start: ", l_min_start)
+                # print("l_min_end: ", l_min_end)
+                if t_min_start < l_min_start or t_min_start >= l_min_end:
+                    if t_min_end <= l_min_start or t_min_end > l_min_end:
+                        if not (t_min_start < l_min_start and t_min_end > l_min_end):
+                            pass
+                        else:
+                            print(f"Termin jest zajęty. Kolizja z {lesson}")
+                            return False
+                        pass
+                    else:
+                        print(f"Termin jest zajęty. Kolizja z {lesson}")
+                        return False
+                else:
+                    print(f"Termin jest zajęty. Kolizja z {lesson}")
+                    return False
+        print("Termin jest wolny")
+        return True
+
     def put(self, lesson: Lesson) -> bool:
 
         if TimetableWithoutBreaks.can_be_transferred_to(self, lesson.termin, lesson.fulltime):
@@ -59,6 +91,44 @@ class TimetableWithoutBreaks(BasicTimetable):
             print("Lesson couldn't be added. Timetable slot is already occupied "
                   "or this lesson term do not fit in the fulltime/parttime scheme")
             return False
+
+    def parse(self, actions: List[str]) -> List[Action]:
+
+        moves = []
+        for i in actions:
+            if i == "d-":
+                moves.append(Action.DAY_EARLIER)
+            elif i == "d+":
+                moves.append(Action.DAY_LATER)
+            elif i == "t-":
+                moves.append(Action.TIME_EARLIER)
+            elif i == "t+":
+                moves.append(Action.TIME_LATER)
+            else:
+                pass
+        return moves
+
+    def perform(self, actions: List[Action]):
+
+        all_les = len(self.timetable)
+
+        for i in range(len(actions)):
+            print("\ncur_action: ", actions[i])
+            les_i = i % all_les
+            print("i: ", i)
+            print("Rozpatrywana lekcja: ", self.timetable[les_i])
+            if actions[i].value == 0:
+                print("============== Zachodzi earlier.Day =================")
+                Lesson.earlierDay(self.timetable[les_i])
+            elif actions[i].value == 1:
+                print("============== Zachodzi later.Day =================")
+                Lesson.laterDay(self.timetable[les_i])
+            elif actions[i].value == 2:
+                print("============== Zachodzi earlier.Time =================")
+                Lesson.earlierTime(self.timetable[les_i])
+            elif actions[i].value == 3:
+                print("============== Zachodzi later.Time =================")
+                Lesson.laterTime(self.timetable[les_i])
 
     def get(self, term: Term) -> Lesson:
         t_min_start = term.hour * 60 + term.minute  # godzina rozpoczęcia terminu w minutach

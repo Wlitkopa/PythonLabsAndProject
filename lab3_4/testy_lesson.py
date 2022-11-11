@@ -44,7 +44,6 @@ class Test_TestAll(unittest.TestCase):
         term_temp = Term(Day.THU, 12, 30)
         self.assertEqual(Test_TestAll.timetable.get(term_temp), None)  # bo wtedy nic nie ma
 
-
     def test_print(self):
         self.assertEqual(Test_TestAll.timetable.__str__(), """               * Poniedziałek            * Wtorek                 * Środa                  * Czwartek               * Piątek                 * Sobota                 * Niedziela              *
 ************************************************************************************************************************************************************************************************
@@ -85,7 +84,6 @@ class Test_TestAll(unittest.TestCase):
         term1_2 = Term(Day.SUN, 18, 30)
         self.assertEqual(Test_TestAll.timetable.can_be_transferred_to(term1_2, Test_TestAll.lesson7.fulltime), True)  # parttime (Geografia)
 
-
     def test_earlierTime(self):
         term1_2 = Term(Day.MON, 6, 30)
         self.assertEqual(Test_TestAll.timetable.can_be_transferred_to(term1_2, Test_TestAll.lesson1.fulltime), False)  # bo wtedy nie ma przedziału czasowego dla parttime (Geografia)
@@ -95,7 +93,6 @@ class Test_TestAll(unittest.TestCase):
         self.assertEqual(Test_TestAll.timetable.can_be_transferred_to(term1_2, Test_TestAll.lesson8.fulltime), True)  # można przesunąć Chemię (fulltime)
         term1_2 = Term(Day.SAT, 17, 0)
         self.assertEqual(Test_TestAll.timetable.can_be_transferred_to(term1_2, Test_TestAll.lesson7.fulltime), True)  # można przesunąć Geografia (parttime)
-
 
     def test_laterTime(self):
         term1_2 = Term(Day.MON, 9, 30)

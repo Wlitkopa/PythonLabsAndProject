@@ -22,13 +22,24 @@ def DayToStr(dzien):
         name = "Niedziela"
     return name
 
-
 class BasicTerm:
 
     def __init__(self, hour, minute, duration=None):
         self.hour = hour
         self.minute = minute
         self.duration = duration
+
+
+
+class Term:
+
+    def __init__(self, day, hour, minute, duration=None):
+        self.hour = hour
+        self.minute = minute
+        self.duration = duration
+        self.day = day
+        # print("self.__day: ", self.__day)
+        # print("self.__day.value: ", self.__day.value)
 
     @property
     def hour(self):
@@ -47,6 +58,14 @@ class BasicTerm:
         self.__minute = minute
 
     @property
+    def day(self):
+        return self.__day
+
+    @day.setter
+    def day(self, day):
+        self.__day = day
+
+    @property
     def duration(self):
         return self.__duration
 
@@ -56,23 +75,6 @@ class BasicTerm:
             self.__duration = duration
         else:
             self.__duration = 90
-
-
-class Term(BasicTerm):
-
-    def __init__(self, day, hour, minute, duration=None):
-        super().__init__(hour, minute, duration)
-        self.day = day
-        # print("self.__day: ", self.__day)
-        # print("self.__day.value: ", self.__day.value)
-
-    @property
-    def day(self):
-        return self.__day
-
-    @day.setter
-    def day(self, day):
-        self.__day = day
 
     def __str__(self):
         return f"{DayToStr(self.__day)} {self.hour}:{self.minute} [{self.duration}]"

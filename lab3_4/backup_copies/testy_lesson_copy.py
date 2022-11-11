@@ -1,14 +1,15 @@
 
 import unittest
-from DeanerySystem import day
-from DeanerySystem.day import Day, nthDayFrom, Action
-from DeanerySystem import term
-from DeanerySystem.term import Term, DayToStr
+import sys
+sys.path.append("/home/przemek/PycharmProjects/ps")
+from lab3_4.DeanerySystem import day
+from lab3_4.DeanerySystem.day import Day, nthDayFrom, Action
+from lab3_4.DeanerySystem import term
+from lab3_4.DeanerySystem.term import Term, DayToStr
 from enum import Enum, IntEnum
 import lesson_copy
 from lesson_copy import Lesson, yeartoString, sctoStrign
-from DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
-
+from lab3_4.DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
 
 
 class Test_TestDay(unittest.TestCase):
