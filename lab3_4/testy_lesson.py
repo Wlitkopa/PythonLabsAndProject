@@ -144,10 +144,5 @@ class Test_TestAll(unittest.TestCase):
         Test_TestAll.timetable.perform(moves)
 
 
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()

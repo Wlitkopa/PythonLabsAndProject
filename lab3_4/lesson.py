@@ -6,6 +6,10 @@ from DeanerySystem.day import Day, nthDayFrom, Action
 from DeanerySystem import term
 from DeanerySystem.term import Term, DayToStr
 from enum import Enum, IntEnum
+
+# from DeanerySystem import Break
+# from lab3_4.DeanerySystem.Break import Break
+
 # from DeanerySystem.TimetableWithoutBreaks import TimetableWithoutBreaks
 # from DeanerySystem.TimetableWithoutBreaks import *
 
@@ -52,6 +56,9 @@ class Lesson:
         if timetable.put(self):
             print("Lesson was added")
             self.timetable = timetable
+        else:
+            self.timetable = timetable
+
 
     @property
     def timetable(self):
@@ -269,7 +276,7 @@ class Lesson:
         # else:
         #     print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
 
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
+        if self.timetable.can_be_transferred_to(temp_term, self.fulltime, False):
             self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True
@@ -301,7 +308,10 @@ class Lesson:
         else:
             print(f"Ten termin nie jest w ograniczeniu czasowym {state}\n")
 
-        if self.timetable.can_be_transferred_to(temp_term, self.fulltime):
+        print("Termin przed zmianą: ", temp_term)
+
+        if self.timetable.can_be_transferred_to(temp_term, self.fulltime, True):
+            print("Termin po sprawdzeniu: ", temp_term)
             self.termin = temp_term
             print(f"\n\nPo zmianach: {self}\n\n")
             return True

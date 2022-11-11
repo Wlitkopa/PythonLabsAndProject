@@ -2,6 +2,7 @@
 from datetime import date
 import sys
 
+import idna.codec
 
 print(str(date.today()))
 print(repr(date.today()))
@@ -9,6 +10,64 @@ print(str('Ala\nma kota'))
 print(repr('Ala\nma kota'))
 
 # marka ilość sprzedaż wypożyczenie
+
+
+class Car:
+
+    iden = {}
+    cars = []
+
+    def __init__(self, clientid, marka, cenas, cenaw, dataw, dataz):
+        self.marka = marka
+        self.cenas = cenas
+        self.cenaw = cenaw
+        self.dataw = dataw
+        self.dataz = dataz
+        self.clientid = clientid
+
+        if Car.iden.get(marka) is None:
+            self.id = 1
+            Car.iden[marka] = 1
+        else:
+            self.id = Car.iden.get(marka) + 1
+            Car.iden[marka] += 1
+
+        Car.cars.append(self)
+
+        def __repr__(self):
+            return 'obiekt = Car(clientid, marka, cena sprzedaży, cena wypożyczenia, data wypożyczenia, data zwrotu'
+
+        def __str__(self):
+            output = ""
+            for car in Car.cars:
+                output += f"Identyfikator auta: {car.id}\n" \
+                          f"Idetyfikator klienta: {car.clientid}" \
+                          f"Marka: {car.marka}" \
+                          f"Cena sprzedaży: {car.cenas}" \
+                          f"Cena wypożyczenia: {car.cenaw}" \
+                          f"Data wypożyczenia: {car.dataw}" \
+                          f"Data zwrotu: {car.dataw}"
+            return output
+
+class Client:
+
+    iden = {}
+    clients = []
+
+    def __init__(self, imie, nazwisko, adres):
+
+        self.imie = imie
+        self.nazwisko = nazwisko
+        self.adres = adres
+
+        if Client.iden.get(nazwisko) is None:
+            self.id = 1
+            Client.iden[nazwisko] = 1
+        else:
+            self.id = Client.iden.get(nazwisko) + 1
+            Client.iden[nazwisko] += 1
+
+        Client.clients.append(self)
 
 
 class Dealer:
