@@ -1,123 +1,17 @@
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List
 import sys
 
 import idna.codec
 
-
-class Command(ABC):
-
-    @abstractmethod
-    def attach(self, observer) -> None:
-        pass
-
-    @abstractmethod
-    def detach(self, observer) -> None:
-        pass
-
-    @abstractmethod
-    def notify(self) -> None:
-        pass
+print(str(date.today()))
+print(repr(date.today()))
+print(str('Ala\nma kota'))
+print(repr('Ala\nma kota'))
 
 
-class Rent(Command):
-
-    def __init__(self):
-        self.vehicule = None
-        self.client = None
-        self._observers = []
-
-    def attach(self, observer) -> None:
-        self._observers.append(observer)
-
-    def detach(self, observer) -> None:
-        self._observers.remove(observer)
-
-    def notify(self) -> None:
-        print("Rent notifying")
-        for observer in self._observers:
-            observer.update(self)
-            print(self)
-
-    def args(self, client, vehicule):
-        self.vehicule = vehicule
-        self.client = client
-        self.notify()
-
-    # def __str__(self):
-    #     return f"rent.client: {self.client}\nrent.vehicule: {self.vehicule}"
-
-
-class Sell(Command):
-
-    def __init__(self):
-        self.vehicule = None
-        self.client = None
-        self._observers = []
-
-    def attach(self, observer) -> None:
-        self._observers.append(observer)
-
-    def detach(self, observer) -> None:
-        self._observers.remove(observer)
-
-    def notify(self) -> None:
-        print("Sell notifying")
-        for observer in self._observers:
-            observer.update(self)
-            # print(self)
-
-    def args(self, client, vehicule):
-        self.vehicule = vehicule
-        self.client = client
-        self.notify()
-
-    # def __str__(self):
-        # return f"sell.client: {self.client}\nsell.vehicule: {self.vehicule}"
-
-
-class Retur(Command):
-
-    def __init__(self):
-        self.vehicule = None
-        self.client = None
-        self._observers = []
-
-    def attach(self, observer) -> None:
-        self._observers.append(observer)
-
-    def detach(self, observer) -> None:
-        self._observers.remove(observer)
-
-    def notify(self) -> None:
-        print("Retur notifying")
-        for observer in self._observers:
-            observer.update(self)
-            print(self)
-
-    def args(self, client, vehicule):
-        self.vehicule = vehicule
-        self.client = client
-        self.notify()
-
-    # def __str__(self):
-    #     return f"retur.client: {self.client}\nretur.vehicule: {self.vehicule}"
-
-
-class Observer(ABC):
-    """
-    The Observer interface declares the update method, used by subjects.
-    """
-
-    @abstractmethod
-    def update(self, commanc: Command) -> None:
-        """
-        Receive update from subject.
-        """
-        pass
-
+# marka ilość sprzedaż wypożyczenie
 
 class BasicVeh(ABC):
 
@@ -187,7 +81,7 @@ class BasicVeh(ABC):
             if isinstance(self, Trailer) and len(self.history[i]) == 4:
                 outcome += f"Przejechane km: {self.history[i][3]}\n"
 
-        print(outcome)
+        return outcome
 
 
 class Trailer(BasicVeh):
@@ -233,8 +127,7 @@ class Trailer(BasicVeh):
             if trailer.cenas is not None:
                 output += f"Cena sprzedaży: {trailer.cenas}\n"
             elif trailer.cenaw is not None:
-                output += f"Id klienta: {trailer.clientid}\n" \
-                          f"Cena wypożyczenia: {trailer.cenaw}\n"
+                output += f"Cena wypożyczenia: {trailer.cenaw}\n"
             if trailer.dataw is not None:
                 output += f"Data wypożyczenia: {trailer.dataw}\n" \
                           f"Data zwrotu: {trailer.dataz}\n"
@@ -302,9 +195,7 @@ class Car(BasicVeh):
                 output += f"Cena wypożyczenia: {car.cenaw}\n"
             if car.dataw is not None:
                 output += f"Data wypożyczenia: {car.dataw}\n" \
-                          f"Data zwrotu: {car.dataz}\n"
-            # if car.dataw is not None and car.zwrot:
-            #     output += f"(Zwrócono ten samochód)"
+                          f"Data zwrotu: {car.dataw}\n"
 
         return output
 
@@ -408,7 +299,7 @@ class Client:
         Dealer.sell(self, car)
 
 
-class Dealer(Observer):
+class Dealer:
     ev_cus = 0
     dane = []
     mag = []
@@ -459,11 +350,11 @@ class Dealer(Observer):
         if delta.days <= 0:
             print("Różnica dat jest mniejsza bądź równa zeru")
             return 2
-        # print("delta: ", delta)
-        # print("delta.days: ", delta.days)
+        print("delta: ", delta)
+        print("delta.days: ", delta.days)
 
         if isinstance(car, Car):
-            # print("car to autoaudi")
+            print("car to autoaudi")
 
             marka = car.marka
             cr_id = f"{car.marka}{car.id}"
@@ -488,8 +379,6 @@ class Dealer(Observer):
             car.cenaw = koszt
 
             kupuje = f"{nazwisko}{cl_id}"
-
-            car.clientid = kupuje
 
             auto = f"{marka}{cr_id}"
 
@@ -519,7 +408,7 @@ class Dealer(Observer):
                 Dealer.all.append([client, sum_koszt, car])
 
         elif isinstance(car, Trailer):
-            # print("Działa ten isinstance")
+            print("Działa ten isinstance")
 
             tr_id = f"przyczepa{car.id}"
             for i in range(len(Dealer.mag)):
@@ -541,15 +430,12 @@ class Dealer(Observer):
             car.cenaw = koszt
 
             kupuje = f"{nazwisko}{cl_id}"
-
-            car.clientid = kupuje
-
-            # print("kupuje: ", kupuje)
+            print("kupuje: ", kupuje)
 
             for i in range(len(Dealer.all)):
-                # print("Działa ta pętla")
-                # print(f"Id sprawdzane: {dealer.all[i][0].nazwisko}{dealer.all[i][0].id}")
-                # print(f"Id funkcji: {nazwisko}{cl_id}")
+                print("Działa ta pętla")
+                print(f"Id sprawdzane: {dealer.all[i][0].nazwisko}{dealer.all[i][0].id}")
+                print(f"Id funkcji: {nazwisko}{cl_id}")
                 if f"{dealer.all[i][0].nazwisko}{dealer.all[i][0].id}" == f"{nazwisko}{cl_id}":
                     # print("Działa ten if")
                     Dealer.all[i][1] = str(int(Dealer.all[i][1]) + int(koszt))
@@ -577,7 +463,7 @@ class Dealer(Observer):
     @staticmethod
     def sell(client, car):
 
-        # print("Działa sell")
+        print("Działa sell")
 
         imie = client.imie
         nazwisko = client.nazwisko
@@ -590,7 +476,7 @@ class Dealer(Observer):
         for i in range(len(Dealer.mag)):
             if str(Dealer.mag[i][0]) == str(marka):
                 msc = i
-                # print("msc: ", msc)
+                print("msc: ", msc)
                 break
         else:
             print("Nie ma takiego samochodu w liście magazynu")
@@ -607,7 +493,6 @@ class Dealer(Observer):
 
         koszt = Dealer.mag[msc][2]
         car.cenas = koszt
-        car.clientid = kupuje
         Dealer.ev_cus += int(koszt)
 
         # print("Jestem w tym miejscu")
@@ -638,7 +523,7 @@ class Dealer(Observer):
     def retur(client, car):
 
         kto_id = f"{client.nazwisko}{client.id}"
-        # print("kto_id: ", kto_id)
+        print("kto_id: ", kto_id)
         marka_id = ""
         marka = ""
 
@@ -665,7 +550,7 @@ class Dealer(Observer):
                         pot_car_id = f"przyczepa{Dealer.all[i][k + 2].id}"
                     if pot_car_id == marka_id:
 
-                        # print("Zaszedł if")
+                        print("Zaszedł if")
                         for j in range(len(Dealer.mag)):
                             if Dealer.mag[j][0] == marka:
                                 out = 1
@@ -676,14 +561,12 @@ class Dealer(Observer):
                                 Dealer.all[i][k + 2].zwrot = True
                                 # print(f"Dealer.all[{i}] po popie: {Dealer.all[i]}")
                                 if isinstance(car, Trailer):
-                                    # km = int(input("Podaj ilość km, którą przejechała przyczepa: "))
-                                    km = 1234
+                                    km = int(input("Podaj ilość km, którą przejechała przyczepa: "))
                                     Dealer.all[i][k + 2].km = km
-
                                     for p in range(len(car.history)):
                                         if client == car.history[p][0]:
                                             car.history[p].append(km)
-                                            return
+                                            break
                                 break
                         else:
                             if i == len(Dealer.mag):
@@ -692,10 +575,10 @@ class Dealer(Observer):
                         break
                     elif k == len(Dealer.all[i]) - 2:
                         print("Ten klient nie kupił takiego samochodu")
-                        return 2
+                        break
             if i == len(Dealer.all) - 1 and out == 0:
                 print("Nie ma takiego wypożyczającego (klienta)")
-                return 3
+                return 2
 
     @staticmethod
     def parseFileLine(linia):
@@ -708,22 +591,6 @@ class Dealer(Observer):
         new = linia.split()
         print("new: ", new)
         return new
-
-    def update(self, command: Command) -> None:
-        if isinstance(command, Rent):
-            print("Działa rent")
-            self.rent(command.client, command.vehicule)
-
-        elif isinstance(command, Sell):
-            print("Działa sell")
-            self.sell(command.client, command.vehicule)
-
-        elif isinstance(command, Retur):
-            print("Działa retur")
-            self.retur(command.client, command.vehicule)
-
-        else:
-            print("Unknown command")
 
     def __str__(self):
         # Dealer.all.append([client, sum_koszt, car])

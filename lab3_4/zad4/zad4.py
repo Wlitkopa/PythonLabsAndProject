@@ -1,5 +1,6 @@
 
 from datetime import date
+from abc import ABC, abstractmethod
 import sys
 
 import idna.codec
@@ -10,6 +11,30 @@ print(str('Ala\nma kota'))
 print(repr('Ala\nma kota'))
 
 # marka ilość sprzedaż wypożyczenie
+
+
+class BasicVeh(ABC):
+
+    def __init__(self, cenas, cenaw, dataw, dataz):
+        self.cenas = cenas
+        self.cenaw = cenaw
+        self.dataw = dataw
+        self.dataz = dataz
+
+
+class Trailer:
+
+    iden = {}
+    trailers = []
+
+    def __init__(self, clientid, cenas, cenaw, dataw, dataz, km):
+        self.cenas = cenas
+        self.cenaw = cenaw
+        self.dataw = dataw
+        self.dataz = dataz
+        self.clientid = clientid
+        self.km = km
+
 
 
 class Car:
@@ -48,6 +73,7 @@ class Car:
                           f"Data wypożyczenia: {car.dataw}" \
                           f"Data zwrotu: {car.dataw}"
             return output
+
 
 class Client:
 

@@ -1,6 +1,7 @@
 
 import unittest
-from lab3_4.zad4.zad4 import Dealer
+
+from zad4 import Dealer
 
 
 class Test_comparison(unittest.TestCase):
