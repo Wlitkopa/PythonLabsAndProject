@@ -2,3 +2,4 @@ audi 1 5000 150
 fiat 5 4000 200
 ford 3 3000 250
 przyczepa 4 5000 300
+peaugot 0 1000 550

@@ -10,34 +10,6 @@ import idna.codec
 global cur_user
 
 
-def prnt(anything):
-    print(anything)
-    return True
-
-
-def reduce(msc):
-    Dealer.mag[msc][1] = int(Dealer.mag[msc][1]) - 1
-    return True
-
-
-def modify(car, x):
-    car.koszt = Dealer.mag[x][2]
-    Dealer.ev_cus += int(Dealer.mag[x][2])
-    return True
-
-
-def Dealerappzero(car, client):
-    sum_koszt = car.koszt
-    Dealer.all.append([client, sum_koszt, car])
-    return True
-
-
-def Dealerappmore(car, x):
-    Dealer.all[x][1] = str(int(Dealer.all[x][1]) + int(car.koszt))
-    Dealer.all[x].append(car)
-    return True
-
-
 def read(func):
 
     def interior(*args):
@@ -45,21 +17,18 @@ def read(func):
 
         # print("args: ", args)
         # func(*args)
-        if cur_user is not None:
-            try:
-                ent = getattr(dealer, f"{cur_user}")
-                print("dealer.cur_user: ", cur_user)
 
-            except AttributeError:
-                raise AttributeError("Nie istnieje taki użytkownik")
-        else:
-            ent = None
+        try:
+            ent = getattr(dealer, f"{cur_user}")
+            print("Wszystko okej!!! dealer.cur_user: ", cur_user)
+
+        except AttributeError:
+            raise AttributeError("Nie istnieje taki użytkownik")
 
         if ent == 'read' or ent == 'readandwrite' or ent == 'writeandread':
             logging.info(f"user {cur_user} just used {func.__name__}")
             func(*args)
         elif ent is None:
-            # print("Zachodzi ten elif")
             func(*args)
         else:
             logging.warning(f"user {cur_user} doesn't have permission 'read' to use method {func.__name__}")
@@ -75,17 +44,13 @@ def write(func):
 
         # print("args: ", args)
         # func(*args)
-        if cur_user is not None:
 
-            try:
-                ent = getattr(dealer, cur_user)
-                print("dealer.cur_user: ", cur_user)
+        try:
+            ent = getattr(dealer, cur_user)
+            print("dealer.cur_user: ", cur_user)
 
-            except AttributeError:
-                raise AttributeError("Nie istnieje taki użytkownik")
-
-        else:
-            ent = None
+        except AttributeError:
+            raise AttributeError("Nie istnieje taki użytkownik")
 
         if ent == 'write' or ent == 'readandwrite' or ent == 'writeandread':
             logging.info(f"user {cur_user} just used {func.__name__}")
@@ -107,14 +72,11 @@ def access(cls):
     temp.pop(0)
     print("temp: ", temp)
     to_access = []
-    global cur_user
 
     if len(temp) == 0:
-        print("Tutaj zaszłoooooo")
+        to_access = [None, None]
         cls.user = None
         cls.ent = None
-        cur_user = None
-        return cls
 
     else:
         for i in range(len(temp)):
@@ -138,6 +100,7 @@ def access(cls):
             to_access.append([user, ent])
             setattr(cls, f"{user}", ent)
             if i == 0:
+                global cur_user
                 cur_user = user
                 setattr(cls, "cur_user", user)
 
@@ -456,7 +419,7 @@ class Client:
 
         if kto is not None:
             kto = kto.split(" ")
-            # print("kto: ", kto)
+            print("kto: ", kto)
 
             self.imie = kto[0]
             self.nazwisko = kto[1]
@@ -477,7 +440,7 @@ class Client:
 
     @imie.setter
     def imie(self, imie):
-        # print("Imie: ", imie)
+        print("Imie: ", imie)
 
         if len(imie) == 0:
             print("Podaj imię")
@@ -496,8 +459,8 @@ class Client:
     @nazwisko.setter
     def nazwisko(self, nazwisko):
 
-        # print("nazwisko: ", nazwisko)
-        # print("len(nazwisko): ", len(nazwisko))
+        print("nazwisko: ", nazwisko)
+        print("len(nazwisko): ", len(nazwisko))
 
         if len(nazwisko) == 0:
             print("Podaj nazwisko")
@@ -628,7 +591,6 @@ class Dealer(Observer):
             Dealer.ev_cus += koszt
             koszt = koszt
             car.cenaw = koszt
-            car.zwrot = False
 
             kupuje = f"{nazwisko}{cl_id}"
 
@@ -720,85 +682,60 @@ class Dealer(Observer):
     @read
     def sell(self, client, car):
 
-        print("Działa sell")
+        # print("Działa sell")
 
+        imie = client.imie
         nazwisko = client.nazwisko
         marka = car.marka
 
         cl_id = client.id
         cr_id = car.id
         car.clientid = cl_id
-        msc_f = 0
 
-
-        not_avail = lambda: ((car.zwrot or car.cenaw is None) and prnt("Samochód jest dostępny")) or (prnt("Samochód jest niedostępny") and exit(1))
-        not_avail()
-
-        miejsce = lambda x: (x == len(Dealer.mag) and prnt("Nie ma takiego samochodu/przyczepy na liście magazynu") and exit(1)) or \
-                            (Dealer.mag[x][0] == str(marka) and prnt(f"Szukane miejsce: {x}") and
-                             ((int(Dealer.mag[x][1]) == 0 and prnt("Brak na stanie") and exit(2)) or
-                              (int(Dealer.mag[x][1]) != 0 and prnt(f"Dealer.mag[{x}][1]: {Dealer.mag[x][1]}") and reduce(x) and modify(car, x)))) or \
-                            (miejsce(x + 1))
-
-        miejsce(msc_f)
-        print(f"Dealer.mag: ", Dealer.mag)
-
-
-
-        # for i in range(len(Dealer.mag)):   # miejsce(msc_f)
-        #     if str(Dealer.mag[i][0]) == str(marka):
-        #         msc = i
-        #         # print("msc: ", msc)
-        #         break
-        # else:
-        #     print("Nie ma takiego samochodu na liście samochodów w magazynie")
-        #     return 1
-        #
-        # if Dealer.mag[msc][1] == 0:
-        #     print("Nie można kupić auta. Brak na stanie")
-        #     return 2
-        # else:
-        #     print("Odjęto auto")
-        #     Dealer.mag[msc][1] = int(Dealer.mag[msc][1]) - 1
+        for i in range(len(Dealer.mag)):
+            if str(Dealer.mag[i][0]) == str(marka):
+                msc = i
+                # print("msc: ", msc)
+                break
+        else:
+            print("Nie ma takiego samochodu w liście magazynu")
+            return 1
+        if Dealer.mag[msc][1] == 0:
+            print("Nie można kupić auta. Brak na stanie")
+            return 2
+        else:
+            print("Odjęto auto")
+            Dealer.mag[msc][1] = int(Dealer.mag[msc][1]) - 1
 
         kupuje = f"{nazwisko}{cl_id}"
         auto = f"{marka}{cr_id}"
 
-        # koszt = Dealer.mag[msc][2]  # modify()
-        # car.cenas = koszt   # modify()
+        koszt = Dealer.mag[msc][2]
+        car.cenas = koszt
         car.clientid = kupuje
-        # Dealer.ev_cus += int(koszt)  # modify()
+        Dealer.ev_cus += int(koszt)
 
-        msc_f = 0
-        appnd = lambda x: ((len(Dealer.all) == 0) and Dealerappzero(car, client)) or \
-                          ((f"{dealer.all[x][0].nazwisko}{dealer.all[x][0].id}" == f"{nazwisko}{cl_id}" and Dealerappmore(car, x)) or
-                           (x == len(Dealer.all) - 1 and Dealerappzero(car, client))) or appnd(x + 1)
+        # print("Jestem w tym miejscu")
 
-        appnd(msc_f)
+        for i in range(len(Dealer.all)):
+            # print("Działa ta pętla")
+            if f"{dealer.all[i][0].nazwisko}{dealer.all[i][0].id}" == f"{nazwisko}{cl_id}":
+                # print("Działa ten if")
+                Dealer.all[i][1] = str(int(Dealer.all[i][1]) + int(koszt))
+                Dealer.all[i].append(car)
+                break
+            elif i == len(Dealer.all) - 1:
+                # print("Działa ten elif")
+                cus = kupuje
+                sum_koszt = koszt
+                Dealer.all.append([client, sum_koszt, car])
+                break
 
-
-
-        print("Jestem w tym miejscu")
-
-        # for i in range(len(Dealer.all)):
-        #     # print("Działa ta pętla")
-        #     if f"{dealer.all[i][0].nazwisko}{dealer.all[i][0].id}" == f"{nazwisko}{cl_id}":
-        #         # print("Działa ten if")
-        #         Dealer.all[i][1] = str(int(Dealer.all[i][1]) + int(koszt))
-        #         Dealer.all[i].append(car)
-        #         break
-        #     elif i == len(Dealer.all) - 1:
-        #         # print("Działa ten elif")
-        #         cus = kupuje
-        #         sum_koszt = koszt
-        #         Dealer.all.append([client, sum_koszt, car])
-        #         break
-        #
-        # if len(Dealer.all) == 0:
-        #     print("Do teraz nic nie było kupione")
-        #     cus = kupuje
-        #     sum_koszt = koszt
-        #     Dealer.all.append([client, sum_koszt, car])
+        if len(Dealer.all) == 0:
+            print("Do teraz nic nie było kupione")
+            cus = kupuje
+            sum_koszt = koszt
+            Dealer.all.append([client, sum_koszt, car])
 
         # print("Dealer.all: ", Dealer.all)
 
@@ -990,6 +927,7 @@ if __name__ == "__main__":
 
     clients = Client()
     dealer = Dealer()
+
     # global cur_user
     # cur_user = "małpa"
 
